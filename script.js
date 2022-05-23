@@ -44,7 +44,35 @@ function moveNumber(char, shift) {
   return newChar;
 }
 
-function movedMessage(mensagem) {
+function moveLetterBack(char, shift) {
+  const code = codigoASCII(char);
+  let newCode = 0;
+  if (code === 66) {
+    newCode = 89;
+  } else if (code === 65) {
+    newCode = 90;
+  } else {
+    newCode = code + shift;
+  }
+  const newChar = fromASCIIToLetter(newCode);
+  return newChar;
+}
+
+function moveNumberBack(char, shift) {
+  const code = codigoASCII(char);
+  let newCode = 0;
+  if (code === 48) {
+    newCode = 56;
+  } else if (code === 49) {
+    newCode = 57;
+  } else {
+    newCode = code + shift;
+  }
+  const newChar = fromASCIIToLetter(newCode);
+  return newChar;
+}
+
+function cryptMessage(mensagem) {
   let newMessage = '';
   for (let index = 0; index < mensagem.length; index+= 1) {
     if(itsLetter(mensagem[index])) {
@@ -53,8 +81,21 @@ function movedMessage(mensagem) {
       newMessage += moveNumber(mensagem[index], 2);
     }
   };
-  return newMessage;
+  return newMessage.slice(0, mensagem.length);
 }
+
+function decryptMessage(mensagem) {
+  let newMessage = '';
+  for (let index = 0; index < mensagem.length; index+= 1) {
+    if(itsLetter(mensagem[index])) {
+      newMessage += moveLetterBack(mensagem[index], -2);
+    } else {
+      newMessage += moveNumberBack(mensagem[index], -2);
+    }
+  };
+  return newMessage.slice(0, mensagem.length);
+}
+
 
 function reverseMessage(mensagem) {
   let reversedMessage = mensagem.split("").reverse().join("");
@@ -62,13 +103,35 @@ function reverseMessage(mensagem) {
 }
 
 function crypt(mensagem) {
-  let cryptMessage = '';
+  let cryptedMessage = '';
   for(let index = 0; index < mensagem.length; index+= 1) {
-    const firstMessage = movedMessage(mensagem);
+    const firstMessage = cryptMessage(mensagem);
     const secondMessage = reverseMessage(firstMessage);
-    cryptMessage += secondMessage;
+    cryptedMessage = secondMessage;
   }
-  return cryptMessage;
+  return cryptedMessage;
 };
 
-crypt('cachorro')
+function decrypt(mensagem) {
+  let decryptedMessage = '';
+  for(let index = 0; index < mensagem.length; index+= 1) {
+    const firstMessage = decryptMessage(mensagem);
+    const secondMessage = reverseMessage(firstMessage);
+    decryptedMessage = secondMessage;
+  }
+  return decryptedMessage;
+};
+window.onload = function() {
+  const btnCrypt = document.getElementById('btn-cript');
+  const btnDecrypt = document.getElementById('btn-decript');
+  const inputMessage = document.getElementById('input-message');
+  const spamMessage = document.getElementById('cript-message');
+  btnCrypt.addEventListener('click', function() {
+    spamMessage.innerHTML = crypt(inputMessage.value);
+    inputMessage.value = '';
+  });
+  btnDecrypt.addEventListener('click', function() {
+    const toDecrypt = spamMessage.innerHTML;
+    spamMessage.innerHTML = decrypt(toDecrypt);
+  })
+}
